@@ -252,7 +252,7 @@ impl Sbbf {
         Self::new(&bitset)
     }
 
-    pub(crate) fn new(bitset: &[u8]) -> Self {
+    pub fn new(bitset: &[u8]) -> Self {
         let data = bitset
             .chunks_exact(4 * 8)
             .map(|chunk| {
@@ -264,6 +264,16 @@ impl Sbbf {
             })
             .collect::<Vec<Block>>();
         Self(data)
+    }
+
+    pub fn get_bitset(&self) -> Vec<u8> {
+        let mut output = vec![];
+
+        for block in &self.0 {
+            output.push(block.to_le_bytes());
+        }
+
+        output.concat()
     }
 
     /// Write the bloom filter data (header and then bitset) to the output. This doesn't
