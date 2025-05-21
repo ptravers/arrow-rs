@@ -270,14 +270,14 @@ impl Sbbf {
     }
 
     /// get the underlying bitset in the bloom filter.
-    pub fn get_bitset(&self) -> Vec<u8> {
+    pub fn into_bitset(&self) -> Vec<[u8; 32]> {
         let mut output = vec![];
 
         for block in &self.0 {
             output.push(block.to_le_bytes());
         }
 
-        output.concat()
+        output
     }
 
     /// Write the bloom filter data (header and then bitset) to the output. This doesn't
