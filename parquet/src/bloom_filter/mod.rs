@@ -102,7 +102,7 @@ const SALT: [u32; 8] = [
 
 /// Each block is 256 bits, broken up into eight contiguous "words", each consisting of 32 bits.
 /// Each word is thought of as an array of bits; each bit is either "set" or "not set".
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Ord, PartialOrd, Copy, Clone)]
 struct Block([u32; 8]);
 impl Block {
     const ZERO: Block = Block([0; 8]);
@@ -185,7 +185,7 @@ impl std::ops::IndexMut<usize> for Block {
 ///
 /// The creation of this structure is based on the [`crate::file::properties::BloomFilterProperties`]
 /// struct set via [`crate::file::properties::WriterProperties`] and is thus hidden by default.
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Ord, PartialOrd, Clone)]
 pub struct Sbbf(Vec<Block>);
 
 pub(crate) const SBBF_HEADER_SIZE_ESTIMATE: usize = 20;
