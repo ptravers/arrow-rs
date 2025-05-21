@@ -254,7 +254,8 @@ impl Sbbf {
         Self::new(&bitset)
     }
 
-    pub(crate) fn new(bitset: &[u8]) -> Self {
+    /// create bloom filter from the bitset.
+    pub fn new(bitset: &[u8]) -> Self {
         let data = bitset
             .chunks_exact(4 * 8)
             .map(|chunk| {
@@ -266,6 +267,17 @@ impl Sbbf {
             })
             .collect::<Vec<Block>>();
         Self(data)
+    }
+
+    /// get the underlying bitset in the bloom filter.
+    pub fn get_bitset(&self) -> Vec<u8> {
+        let mut output = vec![];
+
+        for block in &self.0 {
+            output.push(block.to_le_bytes());
+        }
+
+        output.concat()
     }
 
     /// Write the bloom filter data (header and then bitset) to the output. This doesn't
@@ -374,14 +386,14 @@ impl Sbbf {
     }
 
     /// Check if an [AsBytes] value is probably present or definitely absent in the filter
-    pub fn check<T: AsBytes>(&self, value: &T) -> bool {
+    pub fn check<T: AsBytes + ?Sized>(&self, value: &T) -> bool {
         self.check_hash(hash_as_bytes(value))
     }
 
     /// Check if a hash is in the filter. May return
     /// true for values that was never inserted ("false positive")
     /// but will always return false if a hash has not been inserted.
-    fn check_hash(&self, hash: u64) -> bool {
+    pub fn check_hash(&self, hash: u64) -> bool {
         let block_index = self.hash_to_block_index(hash);
         self.0[block_index].check(hash as u32)
     }
@@ -399,6 +411,13 @@ const SEED: u64 = 0;
 fn hash_as_bytes<A: AsBytes + ?Sized>(value: &A) -> u64 {
     let mut hasher = XxHash64::with_seed(SEED);
     hasher.write(value.as_bytes());
+    hasher.finish()
+}
+
+#[inline]
+pub fn hash(value: &[u8]) -> u64 {
+    let mut hasher = XxHash64::with_seed(SEED);
+    hasher.write(value);
     hasher.finish()
 }
 
