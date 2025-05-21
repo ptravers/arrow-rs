@@ -371,7 +371,7 @@ impl Sbbf {
     }
 
     /// Insert an [AsBytes] value into the filter
-    pub fn insert<T: AsBytes + ?Sized>(&mut self, value: &T) {
+    pub fn insert<T: AsBytes>(&mut self, value: &T) {
         self.insert_hash(hash_as_bytes(value));
     }
 
@@ -404,7 +404,7 @@ impl Sbbf {
 const SEED: u64 = 0;
 
 #[inline]
-fn hash_as_bytes<A: AsBytes + ?Sized>(value: &A) -> u64 {
+fn hash_as_bytes<A: AsBytes>(value: &A) -> u64 {
     XxHash64::oneshot(SEED, value.as_bytes())
 }
 
